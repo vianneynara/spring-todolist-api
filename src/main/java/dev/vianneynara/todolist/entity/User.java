@@ -3,6 +3,7 @@ package dev.vianneynara.todolist.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -55,5 +56,35 @@ public class User extends Auditable {
 
 	public void setTasks(Set<Task> tasks) {
 		this.tasks = tasks;
+	}
+
+	@Override
+	public String toString() {
+		return "User{" +
+			"userId=" + userId +
+			", username='" + username + '\'' +
+			", password='" + password + '\'' +
+			", deadline=" + deadline +
+			", tasks=" + tasks +
+			'}';
+	}
+
+	/**
+	 * This hash code equality helps Hibernate .
+	 * @param o the object to be compared.
+	 * @return whether it's equal.
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		User user = (User) o;
+		return Objects.equals(userId, user.userId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(userId);
 	}
 }

@@ -3,6 +3,7 @@ package dev.vianneynara.todolist.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 public class Task extends Auditable {
@@ -58,5 +59,30 @@ public class Task extends Auditable {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	@Override
+	public String toString() {
+		return "Task{" +
+			"taskId=" + taskId +
+			", title='" + title + '\'' +
+			", deadline=" + deadline +
+			", isCompleted=" + isCompleted +
+			", user=" + user +
+			'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Task task = (Task) o;
+		return Objects.equals(taskId, task.taskId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(taskId);
 	}
 }
