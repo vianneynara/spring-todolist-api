@@ -3,7 +3,6 @@ package dev.vianneynara.todolist.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 public class Task extends Auditable {
@@ -19,8 +18,15 @@ public class Task extends Auditable {
 
 	private Boolean isCompleted;
 
-	// Getters and setters
+	@ManyToOne()
+	@JoinTable(
+		name = "user_task",
+		joinColumns = @JoinColumn(name = "user_id"),
+		inverseJoinColumns = @JoinColumn(name = "task_id")
+	)
+	private User user;
 
+	// Getters and setters
 
 	public String getTitle() {
 		return title;
@@ -44,5 +50,13 @@ public class Task extends Auditable {
 
 	public void setCompleted(Boolean completed) {
 		isCompleted = completed;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 }

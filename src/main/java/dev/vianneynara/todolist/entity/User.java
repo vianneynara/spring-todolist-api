@@ -3,6 +3,7 @@ package dev.vianneynara.todolist.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 public class User extends Auditable {
@@ -18,6 +19,9 @@ public class User extends Auditable {
 	private String password;
 
 	private LocalDate deadline;
+
+	@OneToMany(mappedBy = "user")
+	private Set<Task> tasks;
 
 	// Getters and setters
 
@@ -43,5 +47,13 @@ public class User extends Auditable {
 
 	public void setDeadline(LocalDate deadline) {
 		this.deadline = deadline;
+	}
+
+	public Set<Task> getTasks() {
+		return tasks;
+	}
+
+	public void setTasks(Set<Task> tasks) {
+		this.tasks = tasks;
 	}
 }
