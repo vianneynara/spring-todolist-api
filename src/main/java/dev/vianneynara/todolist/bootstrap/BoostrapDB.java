@@ -7,11 +7,12 @@ import dev.vianneynara.todolist.repository.UsersRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-// @component annotation declared here to tell spring detect this as a spring bean
-
 /**
  * This class is made to instantiate the database with default contents.
  * It creates objects, saving them, and then adding association between the saved objects.
+ * <p>
+ * `@Component` annotation declared here to tell spring to detect this as a spring component.
+ * It will load this as a spring bean then autowires them in. run method is then run.
  */
 @Component
 public class BoostrapDB implements CommandLineRunner {
@@ -69,6 +70,10 @@ public class BoostrapDB implements CommandLineRunner {
 		naraSAVED.getTasks().add(task1SAVED);
 		naraSAVED.getTasks().add(task2SAVED);
 		emiliaSAVED.getTasks().add(task3SAVED);
+
+		// persists/save the changes
+		usersRepository.save(naraSAVED);
+		usersRepository.save(emiliaSAVED);
 
 		// try logging
 		System.out.println("Bootstrap");
