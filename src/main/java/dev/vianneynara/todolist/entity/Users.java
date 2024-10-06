@@ -1,5 +1,6 @@
 package dev.vianneynara.todolist.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -21,6 +22,7 @@ public class Users {
 	private String password;
 
 	@OneToMany(mappedBy = "user")
+	@JsonManagedReference // the owner of the relationship
 	private Set<Tasks> tasks = new HashSet<>();
 
 	// Getters and setters

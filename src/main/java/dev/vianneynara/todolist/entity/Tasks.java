@@ -1,5 +1,6 @@
 package dev.vianneynara.todolist.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.apache.catalina.User;
 
@@ -20,12 +21,14 @@ public class Tasks {
 
 	private Boolean isCompleted;
 
+//	@JoinTable(
+//		name = "user_task",
+//		joinColumns = @JoinColumn(name = "task_id"),
+//		inverseJoinColumns = @JoinColumn(name = "user_id")
+//	)
 	@ManyToOne()
-	@JoinTable(
-		name = "user_task",
-		joinColumns = @JoinColumn(name = "task_id"),
-		inverseJoinColumns = @JoinColumn(name = "user_id")
-	)
+	@JoinColumn(name = "user_id")
+	@JsonBackReference // the inverse of the relationship (dependant side)
 	private Users user = new Users();
 
 	// Getters and setters
