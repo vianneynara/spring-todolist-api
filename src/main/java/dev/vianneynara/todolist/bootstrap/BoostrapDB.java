@@ -66,10 +66,14 @@ public class BoostrapDB implements CommandLineRunner {
 		Users emiliaSAVED = usersRepository.save(emilia);
 		Tasks task3SAVED = tasksRepository.save(task3);
 
-		// creating association between user and task
+		// creating association between user and task interchangeably
 		naraSAVED.getTasks().add(task1SAVED);
 		naraSAVED.getTasks().add(task2SAVED);
 		emiliaSAVED.getTasks().add(task3SAVED);
+
+		task1SAVED.setUser(naraSAVED);
+		task2SAVED.setUser(naraSAVED);
+		task3SAVED.setUser(emiliaSAVED);
 
 		// persists/save the changes
 		usersRepository.save(naraSAVED);
