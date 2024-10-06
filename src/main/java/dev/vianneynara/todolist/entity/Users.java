@@ -2,12 +2,13 @@ package dev.vianneynara.todolist.entity;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+// i made sure that the name does not create conflict between H2, since "User" is a reserved keyword in H2
 @Entity
-public class User extends Auditable {
+public class Users {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,10 +20,8 @@ public class User extends Auditable {
 
 	private String password;
 
-	private LocalDate deadline;
-
 	@OneToMany(mappedBy = "user")
-	private Set<Task> tasks;
+	private Set<Tasks> tasks = new HashSet<>();
 
 	// Getters and setters
 
@@ -42,19 +41,11 @@ public class User extends Auditable {
 		this.password = password;
 	}
 
-	public LocalDate getDeadline() {
-		return deadline;
-	}
-
-	public void setDeadline(LocalDate deadline) {
-		this.deadline = deadline;
-	}
-
-	public Set<Task> getTasks() {
+	public Set<Tasks> getTasks() {
 		return tasks;
 	}
 
-	public void setTasks(Set<Task> tasks) {
+	public void setTasks(Set<Tasks> tasks) {
 		this.tasks = tasks;
 	}
 
@@ -64,7 +55,6 @@ public class User extends Auditable {
 			"userId=" + userId +
 			", username='" + username + '\'' +
 			", password='" + password + '\'' +
-			", deadline=" + deadline +
 			", tasks=" + tasks +
 			'}';
 	}
@@ -79,7 +69,7 @@ public class User extends Auditable {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		User user = (User) o;
+		Users user = (Users) o;
 		return Objects.equals(userId, user.userId);
 	}
 

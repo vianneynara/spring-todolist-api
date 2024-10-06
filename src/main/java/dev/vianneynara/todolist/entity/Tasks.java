@@ -1,12 +1,13 @@
 package dev.vianneynara.todolist.entity;
 
 import jakarta.persistence.*;
+import org.apache.catalina.User;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-public class Task extends Auditable {
+public class Tasks {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,7 +26,7 @@ public class Task extends Auditable {
 		joinColumns = @JoinColumn(name = "user_id"),
 		inverseJoinColumns = @JoinColumn(name = "task_id")
 	)
-	private User user;
+	private Users user = new Users();
 
 	// Getters and setters
 
@@ -53,11 +54,11 @@ public class Task extends Auditable {
 		isCompleted = completed;
 	}
 
-	public User getUser() {
+	public Users getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(Users user) {
 		this.user = user;
 	}
 
@@ -77,7 +78,7 @@ public class Task extends Auditable {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		Task task = (Task) o;
+		Tasks task = (Tasks) o;
 		return Objects.equals(taskId, task.taskId);
 	}
 
