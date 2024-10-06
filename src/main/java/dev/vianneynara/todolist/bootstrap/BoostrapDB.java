@@ -2,8 +2,8 @@ package dev.vianneynara.todolist.bootstrap;
 
 import dev.vianneynara.todolist.entity.Tasks;
 import dev.vianneynara.todolist.entity.Users;
-import dev.vianneynara.todolist.repository.TaskRepository;
-import dev.vianneynara.todolist.repository.UserRepository;
+import dev.vianneynara.todolist.repository.TasksRepository;
+import dev.vianneynara.todolist.repository.UsersRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -17,13 +17,13 @@ import org.springframework.stereotype.Component;
 public class BoostrapDB implements CommandLineRunner {
 
 	// immutables, this has not been initialized, so we should add constructor to fill it.
-	private final UserRepository userRepository;
-	private final TaskRepository taskRepository;
+	private final UsersRepository usersRepository;
+	private final TasksRepository tasksRepository;
 
 	// auto-wiring the repository implementations
-	public BoostrapDB(UserRepository userRepository, TaskRepository taskRepository) {
-		this.userRepository = userRepository;
-		this.taskRepository = taskRepository;
+	public BoostrapDB(UsersRepository usersRepository, TasksRepository tasksRepository) {
+		this.usersRepository = usersRepository;
+		this.tasksRepository = tasksRepository;
 	}
 
 	// this will be run on application startup
@@ -58,12 +58,12 @@ public class BoostrapDB implements CommandLineRunner {
 		task3.setUser(emilia);
 
 		// saving the objects to the database
-		Users naraSAVED = userRepository.save(nara);
-		Tasks task1SAVED = taskRepository.save(task1);
-		Tasks task2SAVED = taskRepository.save(task2);
+		Users naraSAVED = usersRepository.save(nara);
+		Tasks task1SAVED = tasksRepository.save(task1);
+		Tasks task2SAVED = tasksRepository.save(task2);
 
-		Users emiliaSAVED = userRepository.save(emilia);
-		Tasks task3SAVED = taskRepository.save(task3);
+		Users emiliaSAVED = usersRepository.save(emilia);
+		Tasks task3SAVED = tasksRepository.save(task3);
 
 		// creating association between user and task
 		naraSAVED.getTasks().add(task1SAVED);
@@ -72,7 +72,7 @@ public class BoostrapDB implements CommandLineRunner {
 
 		// try logging
 		System.out.println("Bootstrap");
-		System.out.println("Authors count: " + userRepository.count());
-		System.out.println("Tasks count: " + taskRepository.count());
+		System.out.println("Authors count: " + usersRepository.count());
+		System.out.println("Tasks count: " + tasksRepository.count());
 	}
 }
