@@ -33,6 +33,10 @@ public class Tasks {
 
 	// Getters and setters
 
+	public Long getTaskId() {
+		return taskId;
+	}
+
 	public String getTitle() {
 		return title;
 	}
