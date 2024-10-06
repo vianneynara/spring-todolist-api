@@ -23,8 +23,8 @@ public class Tasks {
 	@ManyToOne()
 	@JoinTable(
 		name = "user_task",
-		joinColumns = @JoinColumn(name = "user_id"),
-		inverseJoinColumns = @JoinColumn(name = "task_id")
+		joinColumns = @JoinColumn(name = "task_id"),
+		inverseJoinColumns = @JoinColumn(name = "user_id")
 	)
 	private Users user = new Users();
 
