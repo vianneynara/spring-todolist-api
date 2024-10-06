@@ -71,9 +71,9 @@ public class BoostrapDB implements CommandLineRunner {
 		naraSAVED.getTasks().add(task2SAVED);
 		emiliaSAVED.getTasks().add(task3SAVED);
 
-		task1SAVED.setUser(naraSAVED);
-		task2SAVED.setUser(naraSAVED);
-		task3SAVED.setUser(emiliaSAVED);
+//		task1SAVED.setUser(naraSAVED);
+//		task2SAVED.setUser(naraSAVED);
+//		task3SAVED.setUser(emiliaSAVED);
 
 		// persists/save the changes
 		usersRepository.save(naraSAVED);
