@@ -6,5 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface TasksRepository extends CrudRepository<Tasks, Long> {
+
 	List<Tasks> findByUser_UserId(Long userId);
 }
