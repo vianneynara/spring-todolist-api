@@ -37,13 +37,13 @@ public class BoostrapDB implements CommandLineRunner {
 
 		Tasks task1 = new Tasks();
 		task1.setTitle("Nara's Task 1");
-		task1.setDeadline(java.time.LocalDate.now().plusDays(1));
+		task1.setDeadline(java.time.LocalDate.of(2024, 10, 11));
 		task1.setCompleted(false);
 		task1.setUser(nara);
 
 		Tasks task2 = new Tasks();
 		task2.setTitle("Nara's Task 2");
-		task2.setDeadline(java.time.LocalDate.now().plusDays(1));
+		task2.setDeadline(java.time.LocalDate.of(2024, 10, 12));
 		task2.setCompleted(false);
 		task2.setUser(nara);
 
@@ -54,7 +54,7 @@ public class BoostrapDB implements CommandLineRunner {
 
 		Tasks task3 = new Tasks();
 		task3.setTitle("Emilia's Task 1");
-		task3.setDeadline(java.time.LocalDate.now().plusDays(1));
+		task3.setDeadline(java.time.LocalDate.of(2024, 10, 13));
 		task3.setCompleted(false);
 		task3.setUser(emilia);
 
