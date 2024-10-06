@@ -4,6 +4,8 @@ import dev.vianneynara.todolist.entity.Users;
 import dev.vianneynara.todolist.repository.UsersRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UsersServiceImpl implements UsersService {
 
@@ -16,5 +18,10 @@ public class UsersServiceImpl implements UsersService {
 	@Override
 	public Iterable<Users> findAll() {
 		return usersRepository.findAll();
+	}
+
+	@Override
+	public Optional<Users> findUsersByUsername(String username) {
+		return usersRepository.findUsersByUsername(username);
 	}
 }
