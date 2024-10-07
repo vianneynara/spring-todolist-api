@@ -1,12 +1,13 @@
 package dev.vianneynara.todolist.service;
 
 import dev.vianneynara.todolist.entity.Tasks;
-import dev.vianneynara.todolist.exceptions.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface TasksService {
+
+	Tasks save(Tasks task);
 
 	Iterable<Tasks> findAll();
 

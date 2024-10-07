@@ -1,7 +1,6 @@
 package dev.vianneynara.todolist.service;
 
 import dev.vianneynara.todolist.entity.Tasks;
-import dev.vianneynara.todolist.exceptions.ResourceNotFoundException;
 import dev.vianneynara.todolist.repository.TasksRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +15,11 @@ public class TasksServiceImpl implements TasksService {
 
 	public TasksServiceImpl(TasksRepository tasksRepository) {
 		this.tasksRepository = tasksRepository;
+	}
+
+	@Override
+	public Tasks save(Tasks task) {
+		return tasksRepository.save(task);
 	}
 
 	@Override
