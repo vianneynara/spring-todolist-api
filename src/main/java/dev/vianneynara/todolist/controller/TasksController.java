@@ -31,7 +31,7 @@ public class TasksController {
 	}
 
 	/**
-	 * Create get routing that asks for request header or body of user_id.
+	 * GET routing that asks for request header of token used to access a user's tasks.
 	 * Will return all tasks that are associated with that user_id.
 	 * @param h_userId header `User-Identifier` that contains user id
 	 * @return Mapped JSON response.
@@ -52,6 +52,12 @@ public class TasksController {
 		return ResponseEntity.ok(Map.of("data", tasks));
 	}
 
+	/**
+	 * Deletes a task of a user.
+	 * @param h_userId user identifier or the token.
+	 * @param p_taskId the task identifier.
+	 * @return 200 status of "Successfully deleted" or "Task not found"
+	 */
 	@DeleteMapping("/tasks")
 	public ResponseEntity<String> deleteTaskByUserId
 	(
