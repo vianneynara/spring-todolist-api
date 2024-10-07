@@ -24,16 +24,16 @@ public class AuthController {
 
 	@GetMapping("/request-token")
 	public ResponseEntity<String> login(
-		@RequestBody Map<String, String> requestBody
+		@RequestBody Map<String, Object> requestBody
 		) {
 
-		Optional<Users> user = usersService.findUsersByUsername(requestBody.get("username"));
+		Optional<Users> user = usersService.findUsersByUsername((String) requestBody.get("username"));
 
 		if (user.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
 		}
 
-		if (!user.get().getPassword().equals(requestBody.get("password"))) {
+		if (!user.get().getPassword().equals((String) requestBody.get("password"))) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password.");
 		}
 
