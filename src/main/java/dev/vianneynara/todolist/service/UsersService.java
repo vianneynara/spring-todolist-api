@@ -8,5 +8,7 @@ public interface UsersService {
 
 	Iterable<Users> findAll();
 
+	Optional<Users> findById(Long userId);
+
 	Optional<Users> findUsersByUsername(String username);
 }
