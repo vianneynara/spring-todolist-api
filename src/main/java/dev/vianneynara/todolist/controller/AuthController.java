@@ -2,6 +2,7 @@ package dev.vianneynara.todolist.controller;
 
 import dev.vianneynara.todolist.entity.Users;
 import dev.vianneynara.todolist.service.UsersService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,11 +30,11 @@ public class AuthController {
 		Optional<Users> user = usersService.findUsersByUsername(requestBody.get("username"));
 
 		if (user.isEmpty()) {
-			return ResponseEntity.status(404).body("User not found!");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
 		}
 
 		if (!user.get().getPassword().equals(requestBody.get("password"))) {
-			return ResponseEntity.status(401).body("Incorrect password!");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password.");
 		}
 
 		// returns the id (now acts as a token)
