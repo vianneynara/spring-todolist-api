@@ -2,7 +2,7 @@ package dev.vianneynara.todolist.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import org.apache.catalina.User;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -15,17 +15,16 @@ public class Tasks {
 	@Column(name = "task_id")
 	private Long taskId;
 
+	@Column()
 	private String title;
 
+	@Column(name = "deadline")
 	private LocalDate deadline;
 
-	private Boolean isCompleted;
+	@Column(name = "is_completed")
+	@ColumnDefault("false")
+	private Boolean isCompleted = false;
 
-//	@JoinTable(
-//		name = "user_task",
-//		joinColumns = @JoinColumn(name = "task_id"),
-//		inverseJoinColumns = @JoinColumn(name = "user_id")
-//	)
 	@ManyToOne()
 	@JoinColumn(name = "user_id")
 	@JsonBackReference // the inverse of the relationship (dependant side)

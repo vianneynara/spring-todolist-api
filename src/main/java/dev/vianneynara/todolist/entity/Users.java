@@ -16,9 +16,10 @@ public class Users {
 	@Column(name = "user_id")
 	private Long userId;
 
-	@Column(name = "username")
+	@Column(name = "username", unique = true)
 	private String username;
 
+	@Column()
 	private String password;
 
 	@OneToMany(mappedBy = "user")
