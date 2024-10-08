@@ -7,14 +7,13 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-// i made sure that the name does not create conflict between H2, since "User" is a reserved keyword in H2
 @Entity
-public class Users extends Auditable {
+public class Account extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "user_id")
-	private Long userId;
+	@Column(name = "account_id")
+	private Long accountId;
 
 	@Column(name = "username", unique = true)
 	private String username;
@@ -22,14 +21,14 @@ public class Users extends Auditable {
 	@Column()
 	private String password;
 
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "account")
 	@JsonManagedReference // the owner of the relationship
-	private Set<Tasks> tasks = new HashSet<>();
+	private Set<Task> tasks = new HashSet<>();
 
 	// Getters and setters
 
-	public Long getUserId() {
-		return userId;
+	public Long getAccountId() {
+		return accountId;
 	}
 
 	public String getUsername() {
@@ -48,11 +47,11 @@ public class Users extends Auditable {
 		this.password = password;
 	}
 
-	public Set<Tasks> getTasks() {
+	public Set<Task> getTasks() {
 		return tasks;
 	}
 
-	public void setTasks(Set<Tasks> tasks) {
+	public void setTasks(Set<Task> tasks) {
 		this.tasks = tasks;
 	}
 
@@ -62,8 +61,8 @@ public class Users extends Auditable {
 
 	@Override
 	public String toString() {
-		return "User{" +
-			"userId=" + userId +
+		return "Account{" +
+			"accountId=" + accountId +
 			", username='" + username + '\'' +
 			", password='" + password + '\'' +
 			", tasks=" + tasks +
@@ -80,12 +79,12 @@ public class Users extends Auditable {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		Users user = (Users) o;
-		return Objects.equals(userId, user.userId);
+		Account account = (Account) o;
+		return Objects.equals(accountId, account.accountId);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(userId);
+		return Objects.hashCode(accountId);
 	}
 }

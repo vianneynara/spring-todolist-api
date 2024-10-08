@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-public class Tasks extends Auditable {
+public class Task extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,9 +26,9 @@ public class Tasks extends Auditable {
 	private Boolean isCompleted = false;
 
 	@ManyToOne()
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "account_id")
 	@JsonBackReference // the inverse of the relationship (dependant side)
-	private Users user = new Users();
+	private Account account = new Account();
 
 	// Getters and setters
 
@@ -60,12 +60,12 @@ public class Tasks extends Auditable {
 		isCompleted = completed;
 	}
 
-	public Users getUser() {
-		return user;
+	public Account getAccount() {
+		return account;
 	}
 
-	public void setUser(Users user) {
-		this.user = user;
+	public void setAccount(Account account) {
+		this.account = account;
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class Tasks extends Auditable {
 			", title='" + title + '\'' +
 			", deadline=" + deadline +
 			", isCompleted=" + isCompleted +
-			", user=" + user +
+			", account=" + account +
 			'}';
 	}
 
@@ -84,7 +84,7 @@ public class Tasks extends Auditable {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		Tasks task = (Tasks) o;
+		Task task = (Task) o;
 		return Objects.equals(taskId, task.taskId);
 	}
 

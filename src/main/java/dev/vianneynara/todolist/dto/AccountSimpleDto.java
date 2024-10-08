@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
  * This data transfer object is used to represent user data (INCLUDING PASSWORD)
  * specifically excluding whole tasks, replaces it with amount of tasks instead.
  */
-public class UserSimpleDto {
+public class AccountSimpleDto {
 
     private Long userId;
     private String username;
@@ -15,7 +15,7 @@ public class UserSimpleDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public UserSimpleDto(Long userId, String username, String password, int taskCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public AccountSimpleDto(Long userId, String username, String password, int taskCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.userId = userId;
         this.username = username;
         this.password = password;

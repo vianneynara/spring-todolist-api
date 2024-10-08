@@ -1,7 +1,7 @@
 package dev.vianneynara.todolist.controller;
 
-import dev.vianneynara.todolist.entity.Users;
-import dev.vianneynara.todolist.service.UsersService;
+import dev.vianneynara.todolist.entity.Account;
+import dev.vianneynara.todolist.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,10 +16,10 @@ import java.util.Optional;
 @RequestMapping("/api/v1")
 public class AuthController {
 
-	private final UsersService usersService;
+	private final AccountService accountService;
 
-	public AuthController(UsersService usersService) {
-		this.usersService = usersService;
+	public AuthController(AccountService accountService) {
+		this.accountService = accountService;
 	}
 
 	@GetMapping("/request-token")
@@ -27,17 +27,17 @@ public class AuthController {
 		@RequestBody Map<String, Object> requestBody
 		) {
 
-		Optional<Users> user = usersService.findUsersByUsername((String) requestBody.get("username"));
+		Optional<Account> account = accountService.findAccountByUsername((String) requestBody.get("username"));
 
-		if (user.isEmpty()) {
+		if (account.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
 		}
 
-		if (!user.get().getPassword().equals((String) requestBody.get("password"))) {
+		if (!account.get().getPassword().equals((String) requestBody.get("password"))) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password.");
 		}
 
 		// returns the id (now acts as a token)
-		return ResponseEntity.ok(String.valueOf(user.get().getUserId()));
+		return ResponseEntity.ok(String.valueOf(account.get().getAccountId()));
 	}
 }
