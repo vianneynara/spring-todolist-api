@@ -25,8 +25,7 @@ public class AuthController {
 	@GetMapping("/request-token")
 	public ResponseEntity<String> login(
 		@RequestBody Map<String, Object> requestBody
-		) {
-
+	) {
 		Optional<Account> account = accountService.findAccountByUsername((String) requestBody.get("username"));
 
 		if (account.isEmpty()) {
