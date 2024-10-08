@@ -9,7 +9,7 @@ import java.util.Set;
 
 // i made sure that the name does not create conflict between H2, since "User" is a reserved keyword in H2
 @Entity
-public class Users {
+public class Users extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,6 +54,10 @@ public class Users {
 
 	public void setTasks(Set<Tasks> tasks) {
 		this.tasks = tasks;
+	}
+
+	private int getTasksCount() {
+		return tasks.size();
 	}
 
 	@Override

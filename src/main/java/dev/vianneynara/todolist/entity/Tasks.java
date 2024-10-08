@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-public class Tasks {
+public class Tasks extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
