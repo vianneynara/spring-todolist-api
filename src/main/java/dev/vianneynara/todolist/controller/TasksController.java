@@ -26,9 +26,24 @@ public class TasksController {
 		this.usersService = usersService;
 	}
 
+	/** Speaking method, used to test Spring Boot application context */
+	public String speak() {
+		return "I am ".concat(this.getClass().getName()) + "!";
+	}
+
+	/**
+	 * Gather all tasks in the database.
+	 * @return all tasks.
+	 */
 	@GetMapping("/all-tasks")
-	public Iterable<Tasks> getTasks() {
-		return tasksService.findAll();
+	public ResponseEntity<Object> getTasks(@RequestHeader(name = "System-PIN") String h_systemPin) {
+		String systemPin = "todolist";
+		if (!(systemPin.equals(h_systemPin))) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+
+		Iterable<Tasks> tasks = tasksService.findAll();
+		return ResponseEntity.ok(tasks);
 	}
 
 	/**

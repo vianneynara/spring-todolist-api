@@ -1,9 +1,11 @@
 package dev.vianneynara.todolist.service;
 
+import dev.vianneynara.todolist.dto.UserSimpleDto;
 import dev.vianneynara.todolist.entity.Users;
 import dev.vianneynara.todolist.repository.UsersRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,4 +31,9 @@ public class UsersServiceImpl implements UsersService {
 	public Optional<Users> findUsersByUsername(String username) {
 		return usersRepository.findUsersByUsername(username);
 	}
+
+//	@Override
+//	public List<UserSimpleDto> findAllUserSimpleDtos() {
+//		return usersRepository.findAllUserSimpleDtos();
+//	}
 }
