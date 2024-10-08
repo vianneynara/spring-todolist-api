@@ -7,6 +7,8 @@ import dev.vianneynara.todolist.repository.AccountRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.logging.Logger;
+
 /**
  * This class is made to instantiate the database with default contents.
  * It creates objects, saving them, and then adding association between the saved objects.
@@ -81,8 +83,7 @@ public class BoostrapDB implements CommandLineRunner {
 		accountRepository.save(emiliaSAVED);
 
 		// try logging
-		System.out.println("Bootstrap");
-		System.out.println("Authors count: " + accountRepository.count());
-		System.out.println("Tasks count: " + taskRepository.count());
+		Logger logger = Logger.getLogger(BoostrapDB.class.getName());
+		logger.info("Database bootstrapping completed.");
 	}
 }

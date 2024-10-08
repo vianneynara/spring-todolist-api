@@ -38,6 +38,11 @@ public class TaskServiceImpl implements TaskService {
 	}
 
 	@Override
+	public List<Task> findByAccount_Username(String username) {
+		return taskRepository.findByAccount_Username(username);
+	}
+
+	@Override
 	public boolean deleteById(Long taskId) {
 		// had to double check to confirm whether it exists in the database
 		if (taskRepository.existsById(taskId)) {

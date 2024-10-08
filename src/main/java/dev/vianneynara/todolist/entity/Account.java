@@ -15,7 +15,7 @@ public class Account extends Auditable {
 	@Column(name = "account_id")
 	private Long accountId;
 
-	@Column(name = "username", unique = true)
+	@Column(unique = true)
 	private String username;
 
 	@Column()

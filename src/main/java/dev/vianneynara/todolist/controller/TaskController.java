@@ -37,10 +37,7 @@ public class TaskController {
 	 */
 	@GetMapping("/all-tasks")
 	public ResponseEntity<Object> getTasks(@RequestHeader(name = "System-PIN") String h_systemPin) {
-		String systemPin = "todolist";
-		if (!(systemPin.equals(h_systemPin))) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
+		if (!("todolist".equals(h_systemPin))) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
 		Iterable<Task> tasks = taskService.findAll();
 		return ResponseEntity.ok(tasks);
@@ -50,34 +47,40 @@ public class TaskController {
 	 * GET routing that asks for request header of token used to access a user's tasks.
 	 * Will return all tasks that are associated with that user_id.
 	 *
-	 * @param h_accountId header `Account-Token` that contains user id
+	 * @param h_accountToken header `Account-Token` that contains user id
 	 * @return mapped JSON response.
 	 */
-	@GetMapping("/tasks")
+	@GetMapping("/accounts/{username}/tasks")
 	public ResponseEntity<Map<String, List<Task>>> getTasksByUserId(
-		@RequestHeader(value = "Account-Token") final Long h_accountId
+		@RequestHeader(value = "Account-Token") final Long h_accountToken,
+		@PathVariable("username") final String username
 	) {
+		/* simple auth logic */ if (!isAuthorized(h_accountToken, username)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
 		// query tasks that are associated with the user id
-		final List<Task> tasks = taskService.findByAccount_AccountId(h_accountId);
+		final List<Task> tasks = taskService.findByAccount_Username(username);
 		return ResponseEntity.ok(Map.of("data", tasks));
 	}
 
 	/**
 	 * POST routing to create a new task.
 	 *
-	 * @param h_accountId header `User-Identifier` that contains user id.
+	 * @param h_accountToken header `User-Identifier` that contains user id.
 	 * @param requestBody the request body that must include.
 	 * @return response message with data of the newly created task.
 	 */
-	@PostMapping("/tasks")
+	@PostMapping("/accounts/{username}/tasks")
 	public ResponseEntity<Object> createTask(
-		@RequestHeader(value = "Account-Token") final Long h_accountId,
+		@RequestHeader(value = "Account-Token") final Long h_accountToken,
+		@PathVariable("username") final String username,
 		@RequestBody final Map<String, Object> requestBody
 	) {
-		Optional<Account> user = accountService.findById(h_accountId);
-		if (user.isEmpty()) {
+		Optional<Account> account = accountService.findAccountByUsername(username);
+		if (account.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
 		}
+
+		/* simple auth logic */ if (!isAuthorized(h_accountToken, account.get().getAccountId())) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 
 		final String title = (String) requestBody.get("title");
 		final LocalDate deadLine = LocalDate.parse((String) requestBody.get("deadLine"), DateTimeFormatter.ofPattern("yyyy/MM/dd"));
@@ -86,7 +89,7 @@ public class TaskController {
 			Task task = new Task();
 			task.setTitle(title);
 			task.setDeadline(deadLine);
-			task.setAccount(user.get());
+			task.setAccount(account.get());
 			task = taskService.save(task);
 			Map<String, Object> responseBody = Map.of(
 				"message", "Successfully created",
@@ -106,38 +109,52 @@ public class TaskController {
 	/**
 	 * Deletes a task of a user.
 	 *
-	 * @param h_accountId user identifier or the token.
-	 * @param p_taskId the task identifier.
+	 * @param h_accountToken user identifier or the token.
+	 * @param taskId the task identifier.
 	 * @return 200 status of "Successfully deleted" or "Task not found"
 	 */
-	@DeleteMapping("/tasks")
+	@DeleteMapping("/accounts/{username}/tasks/{taskId}")
 	public ResponseEntity<String> deleteTaskByUserId(
-		@RequestHeader(value = "Account-Token", required = true) final Long h_accountId,
-		@RequestParam(name = "taskId", required = true) final Long p_taskId
+		@RequestHeader(value = "Account-Token") final Long h_accountToken,
+		@PathVariable("username") final String username,
+		@PathVariable("taskId") final Long taskId
 	) {
-
-		// get user with corresponding token (user id now)
-		Optional<Account> user = accountService.findById(h_accountId);
-		if (user.isEmpty()) {
+		Optional<Account> account = accountService.findAccountByUsername(username);
+		if (account.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
 		}
 
+		/* simple auth logic */ if (!isAuthorized(h_accountToken, account.get().getAccountId())) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
 		// get task id
-		Optional<Task> task = taskService.findById(p_taskId);
+		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Task not found");
 		}
 
 		// verify ownership
-		if (!(task.get().getAccount().getAccountId().equals(user.get().getAccountId()))) {
+		if (!(task.get().getAccount().getAccountId().equals(account.get().getAccountId()))) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
 		}
 
 		// return Successfully deleted if resource exists
-		if (taskService.deleteById(p_taskId)) {
+		if (taskService.deleteById(taskId)) {
 			return ResponseEntity.ok("Successfully deleted");
 		} else {
 			return ResponseEntity.ok("Task not found");
 		}
+	}
+
+	private boolean isAuthorized(Long h_accountToken, Long accountId) {
+		return h_accountToken.equals(accountId);
+	}
+
+	private boolean isAuthorized(Long h_accountToken, String username) {
+		Optional<Account> account = accountService.findAccountByUsername(username);
+		if (account.isEmpty()) {
+//			throw new ResourceNotFoundException("Account not found");
+			return false;
+		}
+		return isAuthorized(h_accountToken, account.get().getAccountId());
 	}
 }

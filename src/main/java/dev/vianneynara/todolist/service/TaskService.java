@@ -15,5 +15,7 @@ public interface TaskService {
 
 	List<Task> findByAccount_AccountId(Long userId);
 
+	List<Task> findByAccount_Username(String username);
+
 	boolean deleteById(Long taskId);
 }
