@@ -82,12 +82,12 @@ public class TaskController {
 		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
 
 		final String title = (String) requestBody.get("title");
-		final LocalDate deadLine = LocalDate.parse((String) requestBody.get("deadLine"), DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+		final LocalDate deadline = LocalDate.parse((String) requestBody.get("deadline"), DateTimeFormatter.ofPattern("yyyy/MM/dd"));
 
 		try {
 			Task task = new Task();
 			task.setTitle(title);
-			task.setDeadline(deadLine);
+			task.setDeadline(deadline);
 			task.setAccount(account);
 			task = taskService.save(task);
 			Map<String, Object> responseBody = Map.of(
@@ -95,7 +95,7 @@ public class TaskController {
 				"data", Map.of(
 					"taskId", task.getTaskId(),
 					"title", task.getTitle(),
-					"deadLine", task.getDeadline(),
+					"deadline", task.getDeadline(),
 					"isCompleted", task.getCompleted()
 				)
 			);
@@ -160,6 +160,35 @@ public class TaskController {
 		task.get().setCompleted(!task.get().getCompleted());
 		taskService.save(task.get());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("message", "Successfully toggled completion"));
+	}
+
+	/**
+	 * PATCH routing to change the deadline of a task.
+	 * @param h_authorization header `Authorization` that contains authorization token.
+	 * @param username the username of the account.
+	 * @param taskId the task identifier.
+	 * @param requestBody the request body that must include.
+	 * @return `204` if successful, `404` if task not found.
+	 */
+	@PatchMapping("/accounts/{username}/tasks/{taskId}/change-deadline")
+	public ResponseEntity<Object> changeTaskDeadline(
+		@RequestHeader(value = "Authorization") final String h_authorization,
+		@PathVariable("username") final String username,
+		@PathVariable("taskId") final Long taskId,
+		@RequestBody final Map<String, Object> requestBody
+	) {
+		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
+		checkAccountExistsAndTokenIsAuthorized(h_authorization, accountQueryResult);
+
+		Optional<Task> task = taskService.findById(taskId);
+		if (task.isEmpty()) {
+			throw new TaskNotFoundException();
+		}
+
+		final LocalDate newDeadline = LocalDate.parse((String) requestBody.get("deadline"), DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+		task.get().setDeadline(newDeadline);
+		taskService.save(task.get());
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("message", "Successfully changed deadline"));
 	}
 
 	/**
