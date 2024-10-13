@@ -29,8 +29,13 @@ public class ErrorHandler {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseMessages.UNAUTHORIZED);
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<Object> handleGenericException(Exception ex) {
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An unexpected error occurred"));
-//    }
+    @ExceptionHandler(InvalidRequestBodyValue.class)
+    public ResponseEntity<Object> handleInvalidRequestBodyValue(InvalidRequestBodyValue ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleGenericException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", ex.getMessage()));
+    }
 }
