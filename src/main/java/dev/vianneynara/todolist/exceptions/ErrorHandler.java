@@ -14,6 +14,11 @@ import java.util.Map;
 @ControllerAdvice
 public class ErrorHandler {
 
+    @ExceptionHandler(AccountExistsException.class)
+    public ResponseEntity<Object> handleAccountExistsException(AccountExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseMessages.ACCOUNT_EXISTS);
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessages.USER_NOT_FOUND);

@@ -1,6 +1,7 @@
 package dev.vianneynara.todolist.controller;
 
 import dev.vianneynara.todolist.entity.Account;
+import dev.vianneynara.todolist.exceptions.AccountExistsException;
 import dev.vianneynara.todolist.exceptions.UnauthorizedException;
 import dev.vianneynara.todolist.service.AccountService;
 import org.springframework.http.HttpStatus;
@@ -63,9 +64,8 @@ public class AccountController {
 	) {
 		// Checks whether the username already exists in the database
 		Optional<Account> existsAccount = accountService.findAccountByUsername((String) requestBody.get("username"));
-		if (existsAccount.isPresent()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
-		}
+		if (existsAccount.isPresent())
+			throw new AccountExistsException();
 
 		Account account = new Account();
 		account.setUsername((String) requestBody.get("username"));
