@@ -23,20 +23,23 @@ public class AuthController {
 	}
 
 	@GetMapping("/request-token")
-	public ResponseEntity<String> login(
+	public ResponseEntity<Object> login(
 		@RequestBody Map<String, Object> requestBody
 	) {
-		Optional<Account> account = accountService.findAccountByUsername((String) requestBody.get("username"));
+		Optional<Account> accountQueryResult = accountService.findAccountByUsername((String) requestBody.get("username"));
 
-		if (account.isEmpty()) {
+		if (accountQueryResult.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
 		}
 
-		if (!account.get().getPassword().equals((String) requestBody.get("password"))) {
+		if (!accountQueryResult.get().getPassword().equals((String) requestBody.get("password"))) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password.");
 		}
 
-		// returns the id (now acts as a token)
-		return ResponseEntity.ok(String.valueOf(account.get().getAccountId()));
+		final String TOKEN = "Bearer " + accountQueryResult.get().getAccountId();
+		return ResponseEntity
+			.status(HttpStatus.OK)
+			.header("Content-Type", "application/json")
+			.body(Map.of("token", TOKEN));
 	}
 }
