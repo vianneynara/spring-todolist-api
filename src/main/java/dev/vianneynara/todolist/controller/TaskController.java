@@ -32,13 +32,16 @@ public class TaskController {
 		this.accountService = accountService;
 	}
 
-	/** Speaking method, used to test Spring Boot application context */
+	/**
+	 * Speaking method, used to test Spring Boot application context
+	 */
 	public String speak() {
 		return "I am ".concat(this.getClass().getName()) + "!";
 	}
 
 	/**
 	 * Gather all tasks in the database.
+	 *
 	 * @return all tasks.
 	 */
 	@GetMapping("/all-tasks")
@@ -72,7 +75,7 @@ public class TaskController {
 	 * POST routing to create a new task.
 	 *
 	 * @param h_authorization header `Authorization` that contains authorization token.
-	 * @param requestBody the request body that must include.
+	 * @param requestBody     the request body that must include.
 	 * @return response message with data of the newly created task.
 	 */
 	@PostMapping("/accounts/{username}/tasks")
@@ -83,10 +86,14 @@ public class TaskController {
 	) {
 		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
 
-		final String title = (String) requestBody.get("title");
-		final LocalDate deadline = LocalDate.parse((String) requestBody.get("deadline"), DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+		if (requestBody.get("title") == null || requestBody.get("deadline") == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseMessages.INVALID_REQUEST_BODY_VALUE);
+		}
 
 		try {
+			final String title = (String) requestBody.get("title");
+			final LocalDate deadline = LocalDate.parse((String) requestBody.get("deadline"), DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+
 			Task task = new Task();
 			task.setTitle(title);
 			task.setDeadline(deadline);
@@ -102,8 +109,8 @@ public class TaskController {
 				)
 			);
 			return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request body");
+		} catch (DateTimeParseException e) {
+			throw new InvalidRequestBodyValue("A value's format is invalid");
 		}
 	}
 
@@ -111,7 +118,7 @@ public class TaskController {
 	 * Deletes a task of a user.
 	 *
 	 * @param h_authorization header `Authorization` that contains authorization token.
-	 * @param taskId the task identifier.
+	 * @param taskId          the task identifier.
 	 * @return `200` status of "Successfully deleted" or `404` of "Task not found"
 	 */
 	@DeleteMapping("/accounts/{username}/tasks/{taskId}")
@@ -141,9 +148,9 @@ public class TaskController {
 	 * PUT routing to update a task.
 	 *
 	 * @param h_authorization header `Authorization` that contains authorization token.
-	 * @param username the username of the account.
-	 * @param taskId the task identifier.
-	 * @param requestBody the request body that must include `title`, `deadline`, and `isCompleted`.
+	 * @param username        the username of the account.
+	 * @param taskId          the task identifier.
+	 * @param requestBody     the request body that must include `title`, `deadline`, and `isCompleted`.
 	 * @return `204` if successful, `400` if invalid request body value, `404` if task not found.
 	 */
 	@PutMapping("/accounts/{username}/tasks/{taskId}")
@@ -182,8 +189,8 @@ public class TaskController {
 	 * PATCH routing to toggle the completion of a task.
 	 *
 	 * @param h_authorization header `Authorization` that contains authorization token.
-	 * @param username the username of the account.
-	 * @param taskId the task identifier.
+	 * @param username        the username of the account.
+	 * @param taskId          the task identifier.
 	 * @return response message.
 	 */
 	@PatchMapping("/accounts/{username}/tasks/{taskId}/toggle-completion")
@@ -207,10 +214,11 @@ public class TaskController {
 
 	/**
 	 * PATCH routing to change the deadline of a task.
+	 *
 	 * @param h_authorization header `Authorization` that contains authorization token.
-	 * @param username the username of the account.
-	 * @param taskId the task identifier.
-	 * @param requestBody the request body that must include.
+	 * @param username        the username of the account.
+	 * @param taskId          the task identifier.
+	 * @param requestBody     the request body that must include.
 	 * @return `204` if successful, `404` if task not found.
 	 */
 	@PatchMapping("/accounts/{username}/tasks/{taskId}/change-deadline")
@@ -238,7 +246,7 @@ public class TaskController {
 	 * Custom method to check whether the account query result is empty or not.
 	 * It then checks whether the token is authorized for the user or not.
 	 *
-	 * @param token the token to be checked.
+	 * @param token              the token to be checked.
 	 * @param accountQueryResult the account query result.
 	 * @return the account if the user exists and is authorized.
 	 * @throws UserNotFoundException if the user is not found.
@@ -250,7 +258,7 @@ public class TaskController {
 			throw new UserNotFoundException();
 
 		authenticateToken(token, accountQueryResult.get());
-			
+
 		return accountQueryResult.get();
 	}
 
@@ -262,7 +270,7 @@ public class TaskController {
 	/**
 	 * Custom method to authenticate the token.
 	 *
-	 * @param token the token to be authenticated.
+	 * @param token   the token to be authenticated.
 	 * @param account the account to be authenticated.
 	 */
 	private void authenticateToken(String token, Account account) {
