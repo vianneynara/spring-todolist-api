@@ -1,12 +1,13 @@
 package dev.vianneynara.todolist.controller;
 
-import dev.vianneynara.todolist.entity.Task;
 import dev.vianneynara.todolist.entity.Account;
+import dev.vianneynara.todolist.entity.Task;
+import dev.vianneynara.todolist.exceptions.InvalidRequestBodyValue;
 import dev.vianneynara.todolist.exceptions.TaskNotFoundException;
 import dev.vianneynara.todolist.exceptions.UnauthorizedException;
 import dev.vianneynara.todolist.exceptions.UserNotFoundException;
-import dev.vianneynara.todolist.service.TaskService;
 import dev.vianneynara.todolist.service.AccountService;
+import dev.vianneynara.todolist.service.TaskService;
 import dev.vianneynara.todolist.utils.ResponseMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -91,7 +93,7 @@ public class TaskController {
 			task.setAccount(account);
 			task = taskService.save(task);
 			Map<String, Object> responseBody = Map.of(
-				"message", "Successfully created",
+				"message", "Task successfully created",
 				"data", Map.of(
 					"taskId", task.getTaskId(),
 					"title", task.getTitle(),
@@ -133,6 +135,47 @@ public class TaskController {
 		} else {
 			throw new TaskNotFoundException();
 		}
+	}
+
+	/**
+	 * PUT routing to update a task.
+	 *
+	 * @param h_authorization header `Authorization` that contains authorization token.
+	 * @param username the username of the account.
+	 * @param taskId the task identifier.
+	 * @param requestBody the request body that must include `title`, `deadline`, and `isCompleted`.
+	 * @return `204` if successful, `400` if invalid request body value, `404` if task not found.
+	 */
+	@PutMapping("/accounts/{username}/tasks/{taskId}")
+	public ResponseEntity<Object> updateTask(
+		@RequestHeader(value = "Authorization") final String h_authorization,
+		@PathVariable("username") final String username,
+		@PathVariable("taskId") final Long taskId,
+		@RequestBody final Map<String, Object> requestBody
+	) {
+		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
+		checkAccountExistsAndTokenIsAuthorized(h_authorization, accountQueryResult);
+
+		Optional<Task> task = taskService.findById(taskId);
+		if (task.isEmpty()) {
+			throw new TaskNotFoundException();
+		}
+
+		if (requestBody.get("title") == null || requestBody.get("deadline") == null || requestBody.get("isCompleted") == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseMessages.INVALID_REQUEST_BODY_VALUE);
+		}
+		try {
+			final String title = ((String) requestBody.get("title")).strip();
+			if (title.isEmpty()) throw new InvalidRequestBodyValue("Title is required");
+			task.get().setTitle(title);
+			task.get().setDeadline(LocalDate.parse((String) requestBody.get("deadline"), DateTimeFormatter.ofPattern("yyyy/MM/dd")));
+			task.get().setCompleted((boolean) requestBody.get("isCompleted"));
+			taskService.save(task.get());
+		} catch (DateTimeParseException | ClassCastException e) {
+			throw new InvalidRequestBodyValue("A value's format is invalid");
+		}
+
+		return ResponseEntity.ok(ResponseMessages.TASK_SUCCESSFULLY_UPDATED);
 	}
 
 	/**
