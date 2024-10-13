@@ -101,7 +101,7 @@ public class TaskController {
 					"isCompleted", task.getCompleted()
 				)
 			);
-			return ResponseEntity.ok(responseBody);
+			return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request body");
 		}
