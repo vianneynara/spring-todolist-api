@@ -8,6 +8,8 @@ public interface AccountService {
 
 	Iterable<Account> findAll();
 
+	Account save(Account account);
+
 //	List<UserSimpleDto> findAllUserSimpleDtos();
 
 	Optional<Account> findById(Long userId);

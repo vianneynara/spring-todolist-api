@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -28,7 +29,9 @@ public class AccountController {
 	 * @return all account.
 	 */
 	@GetMapping("/all-accounts")
-	public ResponseEntity<Object> getUsers(@RequestHeader(name = "System-PIN") String h_systemPin) {
+	public ResponseEntity<Object> getUsers(
+		@RequestHeader(name = "System-PIN") String h_systemPin
+	) {
 		final String systemPin = "todolist";
 		if (!(systemPin.equals(h_systemPin))) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -47,5 +50,37 @@ public class AccountController {
 		   mappedAccounts.add(map);
 		}
 		return ResponseEntity.ok(mappedAccounts);
+	}
+
+	/**
+	 * POST routing that creates a new account.
+	 * @param requestBody a JSON of `username` and `password`.
+	 * @return `OK` status for newly created resource, `CONFLICT` status if username already exists.
+	 */
+	@PostMapping("/accounts")
+	public ResponseEntity<Object> createAccount(
+		@RequestBody Map<String, Object> requestBody
+	) {
+		// Checks whether the username already exists in the database
+		Optional<Account> existsAccount = accountService.findAccountByUsername((String) requestBody.get("username"));
+		if (existsAccount.isPresent()) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+		}
+
+		Account account = new Account();
+		account.setUsername((String) requestBody.get("username"));
+		account.setPassword((String) requestBody.get("password"));
+		account.setCreatedAt(LocalDateTime.now());
+		account.setUpdatedAt(LocalDateTime.now());
+		accountService.save(account);
+
+		final String TOKEN = "Bearer " + account.getAccountId();
+		return ResponseEntity.status(HttpStatus.CREATED).body(
+			Map.of(
+				"userId", account.getAccountId(),
+				"username", account.getUsername(),
+				"token", TOKEN
+			)
+		);
 	}
 }
