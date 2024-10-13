@@ -2,13 +2,13 @@ package dev.vianneynara.todolist.service;
 
 import dev.vianneynara.todolist.entity.Task;
 import dev.vianneynara.todolist.repository.TaskRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-// this annotation indicates the context as a service
-@Service
+@Service // this annotation indicates the context as a service
 public class TaskServiceImpl implements TaskService {
 
 	private final TaskRepository taskRepository;
@@ -44,7 +44,7 @@ public class TaskServiceImpl implements TaskService {
 
 	@Override
 	public boolean deleteById(Long taskId) {
-		// had to double check to confirm whether it exists in the database
+		// had to double-check to confirm whether it exists in the database
 		if (taskRepository.existsById(taskId)) {
 			taskRepository.deleteById(taskId);
 			return true;

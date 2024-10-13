@@ -2,8 +2,12 @@ package dev.vianneynara.todolist.controller;
 
 import dev.vianneynara.todolist.entity.Task;
 import dev.vianneynara.todolist.entity.Account;
+import dev.vianneynara.todolist.exceptions.TaskNotFoundException;
+import dev.vianneynara.todolist.exceptions.UnauthorizedException;
+import dev.vianneynara.todolist.exceptions.UserNotFoundException;
 import dev.vianneynara.todolist.service.TaskService;
 import dev.vianneynara.todolist.service.AccountService;
+import dev.vianneynara.todolist.utils.ResponseMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,15 +51,15 @@ public class TaskController {
 	 * GET routing that asks for request header of token used to access a user's tasks.
 	 * Will return all tasks that are associated with that user_id.
 	 *
-	 * @param h_accountToken header `Account-Token` that contains user id
+	 * @param h_authorization header `Authorization` that contains authorization token.
 	 * @return mapped JSON response.
 	 */
 	@GetMapping("/accounts/{username}/tasks")
 	public ResponseEntity<Map<String, List<Task>>> getTasksByUserId(
-		@RequestHeader(value = "Account-Token") final Long h_accountToken,
+		@RequestHeader(value = "Authorization") final String h_authorization,
 		@PathVariable("username") final String username
 	) {
-		/* simple auth logic */ if (!isAuthorized(h_accountToken, username)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+		checkAccountQueryAndTokenIsAuthorized(h_authorization, username);
 
 		// query tasks that are associated with the user id
 		final List<Task> tasks = taskService.findByAccount_Username(username);
@@ -65,22 +69,18 @@ public class TaskController {
 	/**
 	 * POST routing to create a new task.
 	 *
-	 * @param h_accountToken header `User-Identifier` that contains user id.
+	 * @param h_authorization header `Authorization` that contains authorization token.
 	 * @param requestBody the request body that must include.
 	 * @return response message with data of the newly created task.
 	 */
 	@PostMapping("/accounts/{username}/tasks")
 	public ResponseEntity<Object> createTask(
-		@RequestHeader(value = "Account-Token") final Long h_accountToken,
+		@RequestHeader(value = "Authorization") final String h_authorization,
 		@PathVariable("username") final String username,
 		@RequestBody final Map<String, Object> requestBody
 	) {
-		Optional<Account> account = accountService.findAccountByUsername(username);
-		if (account.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-		}
-
-		/* simple auth logic */ if (!isAuthorized(h_accountToken, account.get().getAccountId())) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
+		final Account account = checkAccountQueryAndTokenIsAuthorized(h_authorization, accountQueryResult);
 
 		final String title = (String) requestBody.get("title");
 		final LocalDate deadLine = LocalDate.parse((String) requestBody.get("deadLine"), DateTimeFormatter.ofPattern("yyyy/MM/dd"));
@@ -89,7 +89,7 @@ public class TaskController {
 			Task task = new Task();
 			task.setTitle(title);
 			task.setDeadline(deadLine);
-			task.setAccount(account.get());
+			task.setAccount(account);
 			task = taskService.save(task);
 			Map<String, Object> responseBody = Map.of(
 				"message", "Successfully created",
@@ -109,52 +109,101 @@ public class TaskController {
 	/**
 	 * Deletes a task of a user.
 	 *
-	 * @param h_accountToken user identifier or the token.
+	 * @param h_authorization header `Authorization` that contains authorization token.
 	 * @param taskId the task identifier.
-	 * @return 200 status of "Successfully deleted" or "Task not found"
+	 * @return `200` status of "Successfully deleted" or `404` of "Task not found"
 	 */
 	@DeleteMapping("/accounts/{username}/tasks/{taskId}")
-	public ResponseEntity<String> deleteTaskByUserId(
-		@RequestHeader(value = "Account-Token") final Long h_accountToken,
+	public ResponseEntity<Object> deleteTaskByUserId(
+		@RequestHeader(value = "Authorization") final String h_authorization,
 		@PathVariable("username") final String username,
 		@PathVariable("taskId") final Long taskId
 	) {
-		Optional<Account> account = accountService.findAccountByUsername(username);
-		if (account.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-		}
-
-		/* simple auth logic */ if (!isAuthorized(h_accountToken, account.get().getAccountId())) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
+		checkAccountQueryAndTokenIsAuthorized(h_authorization, accountQueryResult);
 
 		// get task id
 		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Task not found");
-		}
-
-		// verify ownership
-		if (!(task.get().getAccount().getAccountId().equals(account.get().getAccountId()))) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessages.TASK_NOT_FOUND);
 		}
 
 		// return Successfully deleted if resource exists
 		if (taskService.deleteById(taskId)) {
-			return ResponseEntity.ok("Successfully deleted");
+			return ResponseEntity.ok(ResponseMessages.TASK_SUCCESSFULLY_DELETED);
 		} else {
-			return ResponseEntity.ok("Task not found");
+			throw new TaskNotFoundException();
 		}
 	}
 
-	private boolean isAuthorized(Long h_accountToken, Long accountId) {
-		return h_accountToken.equals(accountId);
+	/**
+	 * PATCH routing to toggle the completion of a task.
+	 *
+	 * @param h_authorization header `Authorization` that contains authorization token.
+	 * @param username the username of the account.
+	 * @param taskId the task identifier.
+	 * @return response message.
+	 */
+	@PatchMapping("/accounts/{username}/tasks/{taskId}/toggle-completion")
+	public ResponseEntity<Object> toggleTaskCompletion(
+		@RequestHeader(value = "Authorization") final String h_authorization,
+		@PathVariable("username") final String username,
+		@PathVariable("taskId") final Long taskId
+	) {
+		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
+		checkAccountQueryAndTokenIsAuthorized(h_authorization, accountQueryResult);
+
+		Optional<Task> task = taskService.findById(taskId);
+		if (task.isEmpty()) {
+			throw new TaskNotFoundException();
+		}
+
+		task.get().setCompleted(!task.get().getCompleted());
+		taskService.save(task.get());
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("message", "Successfully toggled completion"));
 	}
 
-	private boolean isAuthorized(Long h_accountToken, String username) {
-		Optional<Account> account = accountService.findAccountByUsername(username);
-		if (account.isEmpty()) {
-//			throw new ResourceNotFoundException("Account not found");
-			return false;
-		}
-		return isAuthorized(h_accountToken, account.get().getAccountId());
+	/**
+	 * Custom method to check whether the account query result is empty or not.
+	 * It then checks whether the token is authorized for the user or not.
+	 *
+	 * @param token the token to be checked.
+	 * @param accountQueryResult the account query result.
+	 * @return the account if the user exists and is authorized.
+	 * @throws UserNotFoundException if the user is not found.
+	 * @throws UnauthorizedException if the user is not authorized.
+	 */
+	private Account checkAccountQueryAndTokenIsAuthorized(String token, Optional<Account> accountQueryResult)
+		throws UserNotFoundException, UnauthorizedException {
+		if (accountQueryResult.isEmpty()) /* simple user checking logic */
+			throw new UserNotFoundException();
+
+		authenticateToken(token, accountQueryResult.get());
+			
+		return accountQueryResult.get();
+	}
+
+	private Account checkAccountQueryAndTokenIsAuthorized(String token, String username) {
+		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
+		return checkAccountQueryAndTokenIsAuthorized(token, accountQueryResult);
+	}
+
+	/**
+	 * Custom method to authenticate the token.
+	 *
+	 * @param token the token to be authenticated.
+	 * @param account the account to be authenticated.
+	 */
+	private void authenticateToken(String token, Account account) {
+		String[] auth = token.split(" ");
+		if (!(Long.valueOf(auth[1]).equals(account.getAccountId())))
+			throw new UnauthorizedException();
+	}
+
+	private void authenticateToken(String token, String username) {
+		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
+		if (accountQueryResult.isEmpty())
+			throw new UserNotFoundException();
+		authenticateToken(token, accountQueryResult.get());
 	}
 }
