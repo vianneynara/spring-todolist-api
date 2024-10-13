@@ -46,7 +46,8 @@ public class TaskController {
 	 */
 	@GetMapping("/all-tasks")
 	public ResponseEntity<Object> getTasks(@RequestHeader(name = "System-PIN") String h_systemPin) {
-		if (!("todolist".equals(h_systemPin))) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		if (!("todolist".equals(h_systemPin)))
+			throw new UnauthorizedException();
 
 		Iterable<Task> tasks = taskService.findAll();
 		return ResponseEntity.ok(tasks);
@@ -130,18 +131,13 @@ public class TaskController {
 		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
 		checkAccountExistsAndTokenIsAuthorized(h_authorization, accountQueryResult);
 
-		// get task id
 		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessages.TASK_NOT_FOUND);
-		}
-
-		// return Successfully deleted if resource exists
-		if (taskService.deleteById(taskId)) {
-			return ResponseEntity.ok(ResponseMessages.TASK_SUCCESSFULLY_DELETED);
-		} else {
 			throw new TaskNotFoundException();
 		}
+
+		taskService.deleteById(taskId);
+		return ResponseEntity.ok(ResponseMessages.TASK_SUCCESSFULLY_DELETED);
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package dev.vianneynara.todolist.controller;
 
 import dev.vianneynara.todolist.entity.Account;
+import dev.vianneynara.todolist.exceptions.UnauthorizedException;
 import dev.vianneynara.todolist.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +34,8 @@ public class AccountController {
 		@RequestHeader(name = "System-PIN") String h_systemPin
 	) {
 		final String systemPin = "todolist";
-		if (!(systemPin.equals(h_systemPin))) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
+		if (!(systemPin.equals(h_systemPin)))
+			throw new UnauthorizedException();
 
 		List<Account> accounts = (List<Account>) accountService.findAll();
 		Set<Map<String, Object>> mappedAccounts = new HashSet<>();
