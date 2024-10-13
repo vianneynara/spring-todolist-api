@@ -94,7 +94,7 @@ public class TaskController {
 			task = taskService.save(task);
 			Map<String, Object> responseBody = Map.of(
 				"message", "Task successfully created",
-				"data", Map.of(
+				"task", Map.of(
 					"taskId", task.getTaskId(),
 					"title", task.getTitle(),
 					"deadline", task.getDeadline(),
