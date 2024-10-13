@@ -59,7 +59,7 @@ public class TaskController {
 		@RequestHeader(value = "Authorization") final String h_authorization,
 		@PathVariable("username") final String username
 	) {
-		checkAccountQueryAndTokenIsAuthorized(h_authorization, username);
+		checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
 
 		// query tasks that are associated with the user id
 		final List<Task> tasks = taskService.findByAccount_Username(username);
@@ -79,8 +79,7 @@ public class TaskController {
 		@PathVariable("username") final String username,
 		@RequestBody final Map<String, Object> requestBody
 	) {
-		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
-		final Account account = checkAccountQueryAndTokenIsAuthorized(h_authorization, accountQueryResult);
+		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
 
 		final String title = (String) requestBody.get("title");
 		final LocalDate deadLine = LocalDate.parse((String) requestBody.get("deadLine"), DateTimeFormatter.ofPattern("yyyy/MM/dd"));
@@ -120,7 +119,7 @@ public class TaskController {
 		@PathVariable("taskId") final Long taskId
 	) {
 		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
-		checkAccountQueryAndTokenIsAuthorized(h_authorization, accountQueryResult);
+		checkAccountExistsAndTokenIsAuthorized(h_authorization, accountQueryResult);
 
 		// get task id
 		Optional<Task> task = taskService.findById(taskId);
@@ -151,7 +150,7 @@ public class TaskController {
 		@PathVariable("taskId") final Long taskId
 	) {
 		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
-		checkAccountQueryAndTokenIsAuthorized(h_authorization, accountQueryResult);
+		checkAccountExistsAndTokenIsAuthorized(h_authorization, accountQueryResult);
 
 		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
@@ -173,7 +172,7 @@ public class TaskController {
 	 * @throws UserNotFoundException if the user is not found.
 	 * @throws UnauthorizedException if the user is not authorized.
 	 */
-	private Account checkAccountQueryAndTokenIsAuthorized(String token, Optional<Account> accountQueryResult)
+	private Account checkAccountExistsAndTokenIsAuthorized(String token, Optional<Account> accountQueryResult)
 		throws UserNotFoundException, UnauthorizedException {
 		if (accountQueryResult.isEmpty()) /* simple user checking logic */
 			throw new UserNotFoundException();
@@ -183,9 +182,9 @@ public class TaskController {
 		return accountQueryResult.get();
 	}
 
-	private Account checkAccountQueryAndTokenIsAuthorized(String token, String username) {
+	private Account checkAccountExistsAndTokenIsAuthorized(String token, String username) {
 		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
-		return checkAccountQueryAndTokenIsAuthorized(token, accountQueryResult);
+		return checkAccountExistsAndTokenIsAuthorized(token, accountQueryResult);
 	}
 
 	/**

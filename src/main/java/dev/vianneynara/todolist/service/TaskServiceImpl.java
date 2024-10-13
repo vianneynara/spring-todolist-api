@@ -2,7 +2,6 @@ package dev.vianneynara.todolist.service;
 
 import dev.vianneynara.todolist.entity.Task;
 import dev.vianneynara.todolist.repository.TaskRepository;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
