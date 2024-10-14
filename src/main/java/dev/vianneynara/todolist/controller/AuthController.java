@@ -5,10 +5,7 @@ import dev.vianneynara.todolist.service.AccountService;
 import dev.vianneynara.todolist.utils.ResponseMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +25,7 @@ public class AuthController {
 	 * @param requestBody Request body containing username and password.
 	 * @return ResponseEntity containing the token.
 	 */
-	@GetMapping("/request-token")
+	@PostMapping("/request-token")
 	public ResponseEntity<Object> login(
 		@RequestBody Map<String, Object> requestBody
 	) {
