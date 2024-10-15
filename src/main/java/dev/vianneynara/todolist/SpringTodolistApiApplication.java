@@ -25,12 +25,16 @@ public class SpringTodolistApiApplication {
 	}
 
 	@Bean
-    public WebMvcConfigurer corsConfigurer() {
+	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/api/v1/**").allowedOrigins("*");
+				registry.addMapping("/api/v1/**")
+						.allowedOrigins("http://localhost:5173")
+					.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+					.allowedHeaders("*")
+					.allowCredentials(true);
 			}
 		};
-    }
+	}
 }

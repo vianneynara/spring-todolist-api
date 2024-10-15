@@ -137,7 +137,7 @@ public class TaskController {
 		}
 
 		taskService.deleteById(taskId);
-		return ResponseEntity.ok(ResponseMessages.TASK_SUCCESSFULLY_DELETED);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	/**
@@ -189,6 +189,7 @@ public class TaskController {
 	 * @param taskId          the task identifier.
 	 * @return response message.
 	 */
+	@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true", allowedHeaders = "*")
 	@PatchMapping("/accounts/{username}/tasks/{taskId}/toggle-completion")
 	public ResponseEntity<Object> toggleTaskCompletion(
 		@RequestHeader(value = "Authorization") final String h_authorization,
@@ -217,6 +218,7 @@ public class TaskController {
 	 * @param requestBody     the request body that must include.
 	 * @return `204` if successful, `404` if task not found.
 	 */
+	@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true", allowedHeaders = "*")
 	@PatchMapping("/accounts/{username}/tasks/{taskId}/change-deadline")
 	public ResponseEntity<Object> changeTaskDeadline(
 		@RequestHeader(value = "Authorization") final String h_authorization,
