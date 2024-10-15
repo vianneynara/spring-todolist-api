@@ -14,8 +14,8 @@ import java.util.Map;
 @ControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler(AccountExistsException.class)
-    public ResponseEntity<Object> handleAccountExistsException(AccountExistsException ex) {
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<Object> handleAccountExistsException(AccountNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseMessages.ACCOUNT_EXISTS);
     }
 

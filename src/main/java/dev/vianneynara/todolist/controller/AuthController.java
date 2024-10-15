@@ -1,8 +1,8 @@
 package dev.vianneynara.todolist.controller;
 
 import dev.vianneynara.todolist.entity.Account;
+import dev.vianneynara.todolist.exceptions.AccountNotFoundException;
 import dev.vianneynara.todolist.service.AccountService;
-import dev.vianneynara.todolist.utils.ResponseMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class AuthController {
 
 		// if the account is not found or the password is incorrect, return 404
 		if (accountQueryResult.isEmpty() || !accountQueryResult.get().getPassword().equals(requestBody.get("password"))) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessages.USER_NOT_FOUND);
+			throw new AccountNotFoundException();
 		}
 
 		final String TOKEN = "Bearer " + accountQueryResult.get().getAccountId();
