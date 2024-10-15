@@ -1,6 +1,10 @@
-# Todo list API
+# Todo List API
 
-Simple gradual project of TODO (tasks) to learn Spring Boot 3.
+Simple tasks project (TODO list) API to practice Spring Boot.
+
+## Main Repository
+
+This project is applied as the providing server of my [Todo Web App](https://github.com/vianneynara/todo-web-app) project.
 
 ## Features
 
@@ -47,4 +51,3 @@ cd spring-todolist-api
 ```shell
 mvn spring-boot:run
 ```
-
