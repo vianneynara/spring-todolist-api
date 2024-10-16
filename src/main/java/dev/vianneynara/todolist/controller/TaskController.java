@@ -128,8 +128,7 @@ public class TaskController {
 		@PathVariable("username") final String username,
 		@PathVariable("taskId") final Long taskId
 	) {
-		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
-		checkAccountExistsAndTokenIsAuthorized(h_authorization, accountQueryResult);
+		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
 
 		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
@@ -156,8 +155,7 @@ public class TaskController {
 		@PathVariable("taskId") final Long taskId,
 		@RequestBody final Map<String, Object> requestBody
 	) {
-		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
-		checkAccountExistsAndTokenIsAuthorized(h_authorization, accountQueryResult);
+		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
 
 		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
@@ -196,8 +194,7 @@ public class TaskController {
 		@PathVariable("username") final String username,
 		@PathVariable("taskId") final Long taskId
 	) {
-		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
-		checkAccountExistsAndTokenIsAuthorized(h_authorization, accountQueryResult);
+		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
 
 		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
@@ -226,8 +223,7 @@ public class TaskController {
 		@PathVariable("taskId") final Long taskId,
 		@RequestBody final Map<String, Object> requestBody
 	) {
-		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
-		checkAccountExistsAndTokenIsAuthorized(h_authorization, accountQueryResult);
+		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
 
 		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
