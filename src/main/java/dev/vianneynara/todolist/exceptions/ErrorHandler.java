@@ -15,7 +15,12 @@ import java.util.Map;
 public class ErrorHandler {
 
     @ExceptionHandler(AccountNotFoundException.class)
-    public ResponseEntity<Object> handleAccountExistsException(AccountNotFoundException ex) {
+    public ResponseEntity<Object> handleAccountNotFoundException(AccountNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessages.ACCOUNT_NOT_FOUND);
+    }
+
+    @ExceptionHandler(AccountExistsException.class)
+    public ResponseEntity<Object> handleAccountExistsException(AccountExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseMessages.ACCOUNT_EXISTS);
     }
 
