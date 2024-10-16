@@ -69,7 +69,7 @@ public class TaskController {
 
 		// query tasks that are associated with the user id
 		final List<Task> tasks = taskService.findByAccount_Username(username);
-		return ResponseEntity.ok(Map.of("data", tasks));
+		return ResponseEntity.ok(Map.of("tasks", tasks));
 	}
 
 	/**
