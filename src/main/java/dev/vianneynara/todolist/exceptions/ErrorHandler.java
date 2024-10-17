@@ -24,6 +24,11 @@ public class ErrorHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseMessages.ACCOUNT_EXISTS);
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Object> handleIncorrectCredentialsException(InvalidCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseMessages.INCORRECT_CREDENTIALS);
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessages.USER_NOT_FOUND);

@@ -5,6 +5,7 @@ import java.util.Map;
 public class ResponseMessages {
     public static final Map<String, String> ACCOUNT_EXISTS = Map.of("message", "Account already exists");
     public static final Map<String, String> ACCOUNT_NOT_FOUND = Map.of("message", "Account not found");
+    public static final Map<String, String> INCORRECT_CREDENTIALS = Map.of("message", "Incorrect credentials");
     public static final Map<String, String> UNAUTHORIZED = Map.of("message", "Unauthorized");
     public static final Map<String, String> TASK_NOT_FOUND = Map.of("message", "Task not found");
     public static final Map<String, String> USER_NOT_FOUND = Map.of("message", "User not found");
