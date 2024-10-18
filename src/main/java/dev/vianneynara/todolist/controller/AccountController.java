@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,8 +70,6 @@ public class AccountController {
 		Account account = new Account();
 		account.setUsername(username);
 		account.setPassword(password);
-		account.setCreatedAt(LocalDateTime.now());
-		account.setUpdatedAt(LocalDateTime.now());
 
 		Account savedAccount = accountService.save(account);
 

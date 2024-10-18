@@ -36,34 +36,29 @@ public class BoostrapDB implements CommandLineRunner {
 		Account nara = new Account();
 		nara.setUsername("nara");
 		nara.setPassword("nara");
-		nara.setCreatedAt(java.time.LocalDateTime.now());
 
 		Task task1 = new Task();
 		task1.setTitle("Nara's Task 1");
 		task1.setDeadline(java.time.LocalDate.of(2024, 10, 11));
 		task1.setCompleted(false);
 		task1.setAccount(nara);
-		task1.setCreatedAt(java.time.LocalDateTime.now());
 
 		Task task2 = new Task();
 		task2.setTitle("Nara's Task 2");
 		task2.setDeadline(java.time.LocalDate.of(2024, 10, 12));
 		task2.setCompleted(false);
 		task2.setAccount(nara);
-		task2.setCreatedAt(java.time.LocalDateTime.now());
 
 		// author emilia
 		Account emilia = new Account();
 		emilia.setUsername("emilia");
 		emilia.setPassword("emilia");
-		emilia.setCreatedAt(java.time.LocalDateTime.now());
 
 		Task task3 = new Task();
 		task3.setTitle("Emilia's Task 1");
 		task3.setDeadline(java.time.LocalDate.of(2024, 10, 13));
 		task3.setCompleted(false);
 		task3.setAccount(emilia);
-		task3.setCreatedAt(java.time.LocalDateTime.now());
 
 		// saving the objects to the database
 		Account naraSAVED = accountRepository.save(nara);
