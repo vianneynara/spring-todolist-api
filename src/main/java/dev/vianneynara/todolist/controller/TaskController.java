@@ -5,7 +5,6 @@ import dev.vianneynara.todolist.entity.Task;
 import dev.vianneynara.todolist.exceptions.InvalidRequestBodyValue;
 import dev.vianneynara.todolist.exceptions.TaskNotFoundException;
 import dev.vianneynara.todolist.exceptions.UnauthorizedException;
-import dev.vianneynara.todolist.exceptions.UserNotFoundException;
 import dev.vianneynara.todolist.service.AccountService;
 import dev.vianneynara.todolist.service.TaskService;
 import dev.vianneynara.todolist.utils.ResponseMessages;
