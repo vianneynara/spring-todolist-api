@@ -65,7 +65,7 @@ public class TaskController {
 		@RequestHeader(value = "Authorization") final String h_authorization,
 		@PathVariable("username") final String username
 	) {
-		checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
+		accountService.authenticateToken(h_authorization, username);
 
 		// query tasks that are associated with the user id
 		final List<Task> tasks = taskService.findByAccount_Username(username);
@@ -85,7 +85,7 @@ public class TaskController {
 		@PathVariable("username") final String username,
 		@RequestBody final Map<String, Object> requestBody
 	) {
-		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
+		final Account account = accountService.authenticateToken(h_authorization, username);
 
 		if (requestBody.get("title") == null || requestBody.get("deadline") == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseMessages.INVALID_REQUEST_BODY_VALUE);
@@ -128,7 +128,7 @@ public class TaskController {
 		@PathVariable("username") final String username,
 		@PathVariable("taskId") final Long taskId
 	) {
-		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
+		final Account account = accountService.authenticateToken(h_authorization, username);
 
 		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
@@ -155,7 +155,7 @@ public class TaskController {
 		@PathVariable("taskId") final Long taskId,
 		@RequestBody final Map<String, Object> requestBody
 	) {
-		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
+		final Account account = accountService.authenticateToken(h_authorization, username);
 
 		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
@@ -194,7 +194,7 @@ public class TaskController {
 		@PathVariable("username") final String username,
 		@PathVariable("taskId") final Long taskId
 	) {
-		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
+		final Account account = accountService.authenticateToken(h_authorization, username);
 
 		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
@@ -223,7 +223,7 @@ public class TaskController {
 		@PathVariable("taskId") final Long taskId,
 		@RequestBody final Map<String, Object> requestBody
 	) {
-		final Account account = checkAccountExistsAndTokenIsAuthorized(h_authorization, username);
+		final Account account = accountService.authenticateToken(h_authorization, username);
 
 		Optional<Task> task = taskService.findById(taskId);
 		if (task.isEmpty()) {
@@ -234,49 +234,5 @@ public class TaskController {
 		task.get().setDeadline(newDeadline);
 		taskService.save(task.get());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("message", "Successfully changed deadline"));
-	}
-
-	/**
-	 * Custom method to check whether the account query result is empty or not.
-	 * It then checks whether the token is authorized for the user or not.
-	 *
-	 * @param token              the token to be checked.
-	 * @param accountQueryResult the account query result.
-	 * @return the account if the user exists and is authorized.
-	 * @throws UserNotFoundException if the user is not found.
-	 * @throws UnauthorizedException if the user is not authorized.
-	 */
-	private Account checkAccountExistsAndTokenIsAuthorized(String token, Optional<Account> accountQueryResult)
-		throws UserNotFoundException, UnauthorizedException {
-		if (accountQueryResult.isEmpty()) /* simple user checking logic */
-			throw new UserNotFoundException();
-
-		authenticateToken(token, accountQueryResult.get());
-
-		return accountQueryResult.get();
-	}
-
-	private Account checkAccountExistsAndTokenIsAuthorized(String token, String username) {
-		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
-		return checkAccountExistsAndTokenIsAuthorized(token, accountQueryResult);
-	}
-
-	/**
-	 * Custom method to authenticate the token.
-	 *
-	 * @param token   the token to be authenticated.
-	 * @param account the account to be authenticated.
-	 */
-	private void authenticateToken(String token, Account account) {
-		String[] auth = token.split(" ");
-		if (!(Long.valueOf(auth[1]).equals(account.getAccountId())))
-			throw new UnauthorizedException();
-	}
-
-	private void authenticateToken(String token, String username) {
-		Optional<Account> accountQueryResult = accountService.findAccountByUsername(username);
-		if (accountQueryResult.isEmpty())
-			throw new UserNotFoundException();
-		authenticateToken(token, accountQueryResult.get());
 	}
 }
