@@ -10,9 +10,15 @@ public interface AccountService {
 
 	Account save(Account account);
 
-//	List<UserSimpleDto> findAllUserSimpleDtos();
+	Account findById(Long userId);
 
-	Optional<Account> findById(Long userId);
+	Account findAccountByUsername(String username);
 
-	Optional<Account> findAccountByUsername(String username);
+	// Non repository method
+
+	boolean accountExists(String username);
+
+	Account authenticateToken(String token, String username);
+
+	String requestToken(String username, String password);
 }
