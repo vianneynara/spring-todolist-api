@@ -1,23 +1,17 @@
 package dev.vianneynara.todolist.controller;
 
+import dev.vianneynara.todolist.dto.TaskDto;
 import dev.vianneynara.todolist.entity.Account;
 import dev.vianneynara.todolist.entity.Task;
-import dev.vianneynara.todolist.exceptions.InvalidRequestBodyValue;
-import dev.vianneynara.todolist.exceptions.TaskNotFoundException;
 import dev.vianneynara.todolist.exceptions.UnauthorizedException;
 import dev.vianneynara.todolist.service.AccountService;
 import dev.vianneynara.todolist.service.TaskService;
-import dev.vianneynara.todolist.utils.ResponseMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -86,32 +80,18 @@ public class TaskController {
 	) {
 		final Account account = accountService.authenticateToken(h_authorization, username);
 
-		if (requestBody.get("title") == null || requestBody.get("deadline") == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseMessages.INVALID_REQUEST_BODY_VALUE);
-		}
+		final Task task = taskService.save(
+			(String) requestBody.get("title"),
+			(String) requestBody.get("deadline"),
+			account
+		);
 
-		try {
-			final String title = (String) requestBody.get("title");
-			final LocalDate deadline = LocalDate.parse((String) requestBody.get("deadline"), DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+		Map<String, Object> responseBody = Map.of(
+			"message", "Task successfully created",
+			"task", new TaskDto(task)
+		);
 
-			Task task = new Task();
-			task.setTitle(title);
-			task.setDeadline(deadline);
-			task.setAccount(account);
-			task = taskService.save(task);
-			Map<String, Object> responseBody = Map.of(
-				"message", "Task successfully created",
-				"task", Map.of(
-					"taskId", task.getTaskId(),
-					"title", task.getTitle(),
-					"deadline", task.getDeadline(),
-					"isCompleted", task.getCompleted()
-				)
-			);
-			return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
-		} catch (DateTimeParseException e) {
-			throw new InvalidRequestBodyValue("A value's format is invalid");
-		}
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
 	}
 
 	/**
@@ -127,12 +107,7 @@ public class TaskController {
 		@PathVariable("username") final String username,
 		@PathVariable("taskId") final Long taskId
 	) {
-		final Account account = accountService.authenticateToken(h_authorization, username);
-
-		Optional<Task> task = taskService.findById(taskId);
-		if (task.isEmpty()) {
-			throw new TaskNotFoundException();
-		}
+		accountService.authenticateToken(h_authorization, username);
 
 		taskService.deleteById(taskId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -156,26 +131,20 @@ public class TaskController {
 	) {
 		final Account account = accountService.authenticateToken(h_authorization, username);
 
-		Optional<Task> task = taskService.findById(taskId);
-		if (task.isEmpty()) {
-			throw new TaskNotFoundException();
-		}
+		final Task task = taskService.update(
+			taskId,
+			account,
+			(String) requestBody.get("title"),
+			(String) requestBody.get("deadline"),
+			(Boolean) requestBody.get("isCompleted")
+		);
 
-		if (requestBody.get("title") == null || requestBody.get("deadline") == null || requestBody.get("isCompleted") == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseMessages.INVALID_REQUEST_BODY_VALUE);
-		}
-		try {
-			final String title = ((String) requestBody.get("title")).strip();
-			if (title.isEmpty()) throw new InvalidRequestBodyValue("Title is required");
-			task.get().setTitle(title);
-			task.get().setDeadline(LocalDate.parse((String) requestBody.get("deadline"), DateTimeFormatter.ofPattern("yyyy/MM/dd")));
-			task.get().setCompleted((boolean) requestBody.get("isCompleted"));
-			taskService.save(task.get());
-		} catch (DateTimeParseException | ClassCastException e) {
-			throw new InvalidRequestBodyValue("A value's format is invalid");
-		}
+		Map<String, Object> responseBody = Map.of(
+			"message", "Task successfully updated",
+			"task", new TaskDto(task)
+		);
 
-		return ResponseEntity.ok(ResponseMessages.TASK_SUCCESSFULLY_UPDATED);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(responseBody);
 	}
 
 	/**
@@ -193,16 +162,11 @@ public class TaskController {
 		@PathVariable("username") final String username,
 		@PathVariable("taskId") final Long taskId
 	) {
-		final Account account = accountService.authenticateToken(h_authorization, username);
+		accountService.authenticateToken(h_authorization, username);
 
-		Optional<Task> task = taskService.findById(taskId);
-		if (task.isEmpty()) {
-			throw new TaskNotFoundException();
-		}
+		taskService.toggleCompletion(taskId);
 
-		task.get().setCompleted(!task.get().getCompleted());
-		taskService.save(task.get());
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("message", "Successfully toggled completion"));
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	/**
@@ -211,7 +175,7 @@ public class TaskController {
 	 * @param h_authorization header `Authorization` that contains authorization token.
 	 * @param username        the username of the account.
 	 * @param taskId          the task identifier.
-	 * @param requestBody     the request body that must include.
+	 * @param requestBody     the request body that must include `deadline` with `yyyy/MM/dd` format.
 	 * @return `204` if successful, `404` if task not found.
 	 */
 	@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true", allowedHeaders = "*")
@@ -222,16 +186,10 @@ public class TaskController {
 		@PathVariable("taskId") final Long taskId,
 		@RequestBody final Map<String, Object> requestBody
 	) {
-		final Account account = accountService.authenticateToken(h_authorization, username);
+		accountService.authenticateToken(h_authorization, username);
 
-		Optional<Task> task = taskService.findById(taskId);
-		if (task.isEmpty()) {
-			throw new TaskNotFoundException();
-		}
+		taskService.changeDeadline(taskId, (String) requestBody.get("deadline"));
 
-		final LocalDate newDeadline = LocalDate.parse((String) requestBody.get("deadline"), DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-		task.get().setDeadline(newDeadline);
-		taskService.save(task.get());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("message", "Successfully changed deadline"));
 	}
 }
