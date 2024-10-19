@@ -7,6 +7,8 @@ import dev.vianneynara.todolist.exceptions.TaskNotFoundException;
 import dev.vianneynara.todolist.exceptions.UnauthorizedException;
 import dev.vianneynara.todolist.repository.TaskRepository;
 import jakarta.transaction.Transactional;
+import org.hibernate.StaleObjectStateException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,16 +16,19 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service // this annotation indicates the context as a service
 public class TaskServiceImpl implements TaskService {
 
 	private final TaskRepository taskRepository;
 	private final AccountService accountService;
+	private final Logger logger;
 
 	public TaskServiceImpl(TaskRepository taskRepository, AccountService accountService) {
 		this.taskRepository = taskRepository;
 		this.accountService = accountService;
+		this.logger = Logger.getLogger(TaskServiceImpl.class.getName());
 	}
 
 	@Transactional
@@ -90,14 +95,19 @@ public class TaskServiceImpl implements TaskService {
 		return taskRepository.findByAccount_Username(username);
 	}
 
+	@Transactional
 	@Override
 	public boolean deleteById(Long taskId) {
-		// had to double-check to confirm whether it exists in the database
-		if (taskRepository.existsById(taskId)) {
-			taskRepository.deleteById(taskId);
+		try {
+			if (taskRepository.existsById(taskId)) {
+				taskRepository.deleteById(taskId);
+				return true;
+			}
+			return false;
+		} catch (StaleObjectStateException | OptimisticLockingFailureException e) {
+			logger.warning("Attempted to delete an already deleted task: " + taskId);
 			return true;
 		}
-		return false;
 	}
 
 	@Transactional

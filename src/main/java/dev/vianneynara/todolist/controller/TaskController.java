@@ -109,8 +109,12 @@ public class TaskController {
 	) {
 		accountService.authenticateToken(h_authorization, username);
 
-		taskService.deleteById(taskId);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		boolean deleted = taskService.deleteById(taskId);
+		if (deleted) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Task not found");
+		}
 	}
 
 	/**
