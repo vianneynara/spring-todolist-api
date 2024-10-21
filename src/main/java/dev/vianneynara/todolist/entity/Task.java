@@ -1,6 +1,7 @@
 package dev.vianneynara.todolist.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import dev.vianneynara.todolist.utils.idgen.CustomSequence;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -11,7 +12,7 @@ import java.util.Objects;
 public class Task extends Auditable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@CustomSequence(name = "snowflake")
 	@Column(name = "task_id")
 	private Long taskId;
 
