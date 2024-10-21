@@ -1,6 +1,7 @@
 package dev.vianneynara.todolist.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import dev.vianneynara.todolist.utils.idgen.CustomSequence;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -11,7 +12,7 @@ import java.util.Set;
 public class Account extends Auditable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@CustomSequence(name = "snowflake")
 	@Column(name = "account_id")
 	private Long accountId;
 
