@@ -1,4 +1,4 @@
-package dev.vianneynara.todolist.utils;
+package dev.vianneynara.todolist.utils.idgen;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
@@ -11,7 +11,7 @@ import org.hibernate.id.IdentifierGenerator;
  */
 @Slf4j
 public class SnowFlakeIdGenerator implements IdentifierGenerator {
-	private static final long EPOCH = 1609459200000L; // 2021-01-01 00:00:00 UTC
+	private static final long EPOCH = 1729468800000L; // 2024-10-21 00:00:00 UTC
 	private static final long WORKER_ID_BITS = 5L;
 	private static final long DATACENTER_ID_BITS = 5L;
 	private static final long SEQUENCE_BITS = 12L;
